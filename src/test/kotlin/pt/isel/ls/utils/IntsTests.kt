@@ -40,7 +40,6 @@ class IntsTests {
         }
     }
 
-
     @Test
     fun indexOfBinary_right_bound_parameter_is_exclusive() {
         val v = intArrayOf(2, 2, 2)
