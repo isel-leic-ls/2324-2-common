@@ -14,12 +14,15 @@ class HandlersTests {
     fun `getQuoteOfDayHandler returns response with a quote`() {
         // Arrange
         val request = Request(Method.GET, QUOTE_ROUTE)
+        val theQuote = Quote("Hello, World!", "Anonymous")
+        val fakeService = { theQuote }
+        val getQuoteOfDayHandler = buildGetQuoteOfDayHandler(fakeService)
         // Act
         val response = getQuoteOfDayHandler(request)
         // Assert
         val content = Json.decodeFromString<QuoteOfDay>(response.bodyString())
-        assertTrue(content.quote.isNotBlank())
-        assertTrue(content.author.isNotBlank())
+        assertEquals(expected = theQuote.text, actual = content.quote)
+        assertEquals(expected = theQuote.author, actual = content.author)
         assertTrue(content.date.isNotBlank())
         assertEquals(expected = "application/json", actual = response.header("Content-Type"))
     }

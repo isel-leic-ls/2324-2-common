@@ -1,16 +1,31 @@
 package pt.isel.ls.quoteofday
 
 import kotlinx.serialization.Serializable
-import org.http4k.core.Request
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import org.http4k.core.HttpHandler
 import org.http4k.core.Response
-import java.time.LocalDate
+import org.http4k.core.Status
 
 /**
- * Handles the request for the quote of the day
+ * Handles the request for the quote of the day using the given service. Passing the service as a parameter allows the
+ * handler to be tested with a fake service that returns a known quote, instead of the real service that returns a quote
+ * that changes every day.
  */
-fun getQuoteOfDayHandler(request: Request): Response {
-    TODO()
+fun handleGetQuoteOfDay(service: QuoteOfDayService): Response {
+    val quote = service()
+    val quoteOfDay = quote.toQuoteOfDay()
+    return Response(Status.OK)
+        .header("Content-Type", "application/json")
+        .body(Json.encodeToString(quoteOfDay))
 }
+
+/**
+ * Builds the handler for the quote of the day by injecting the dependency to the service. This function is useful for
+ * testing purposes, as it allows the injection of a fake service that returns predictable results. By default, the
+ * handler is built with the real service that returns a quote that changes every day.
+ */
+fun buildGetQuoteOfDayHandler(service: QuoteOfDayService = buildService()): HttpHandler = { _ -> handleGetQuoteOfDay(service) }
 
 /**
  * Represents data contained in the QuoteOfDay HTTP service responses. These responses contain a JSON representation of a
@@ -27,4 +42,8 @@ data class QuoteOfDay(val quote: String, val author: String, val date: String)
 /**
  * Extension function that converts a Quote to a QuoteOfDay
  */
-fun Quote.toQuoteOfDay(): QuoteOfDay = QuoteOfDay(text, author, LocalDate.now().toString())
+fun Quote.toQuoteOfDay(): QuoteOfDay = QuoteOfDay(
+    quote = text,
+    author = author,
+    date = currentLocalDate().toString()
+)
