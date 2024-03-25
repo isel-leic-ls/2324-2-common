@@ -3,6 +3,8 @@ package pt.isel.ls.quoteofday
 import kotlinx.serialization.json.Json
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.core.UriTemplate
+import org.http4k.routing.RoutedRequest
 import pt.isel.ls.QUOTE_ROUTE
 import kotlin.test.Test
 import kotlin.test.assertEquals
